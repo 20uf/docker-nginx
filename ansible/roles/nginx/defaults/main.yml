@@ -1,0 +1,7 @@
+---
+conf: 
+  user: www-data
+  worker_processes: 4
+  pid: /run/nginx.pid
+  event:
+    worker_connections: 768

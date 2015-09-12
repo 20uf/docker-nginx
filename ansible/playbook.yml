@@ -1,0 +1,24 @@
+---
+
+- hosts: symfony
+  gather_facts: false
+  vars:
+    - server_hostname: localhost
+    - app_path: /vhost/current
+    - app_path_www: /vhost/current/web"
+    - app_user: www-data
+    - app_group: www-data
+  tasks:
+    - name: Creer le dossier
+      file: path={{ app_path }} state=directory mode=0755 owner={{ app_user }} group={{ app_group }}
+
+    - name: Mettre les bons droits sur les répertoires
+      file: dest={{ app_path }}
+          mode=0775 owner={{ app_user }} group={{ app_group }}
+          recurse=yes
+
+  gather_facts: false
+
+  roles:
+    - { role: nginx, domains: [ { domain: symfony.dev, document_root: /vhost/current/web, environment: development, index: app_dev.php} ] }
+    - php-fpm
