@@ -22,4 +22,6 @@ RUN ansible-playbook ansible/playbook.yml -c local -vvv
 # Port
 EXPOSE 80 443
 
-CMD service php5-fpm start && nginx
+ADD start.sh /start.sh 
+RUN chmod +x /start.sh
+ENTRYPOINT ["/start.sh"]

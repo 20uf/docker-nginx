@@ -1,0 +1,32 @@
+---
+
+- name: Install common packages
+  action: "apt pkg={{ item }} update_cache=yes cache_valid_time=3600 state=present"
+  with_items:
+    - software-properties-common
+    - htop
+    - curl
+    - wget
+    - unzip
+    - bzip2
+    - gzip
+    - xzip
+    - ack-grep
+    - tmux
+    - vim
+    - git
+    - ntp
+  notify:
+    - Start NTP
+
+- name: Set local timezone
+  copy: content={{ timezone }}
+        dest=/etc/timezone
+  notify:
+    - Restart NTP
+
+- name: set locale.gen file
+  locale_gen: name={{ locale_lang }} state=present
+
+- name: set locale to {{ locale }}
+  template: src=default.j2 dest=/etc/default/locale

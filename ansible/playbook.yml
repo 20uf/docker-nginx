@@ -9,10 +9,10 @@
     - app_user: www-data
     - app_group: www-data
   tasks:
-    - name: Creer le dossier
+    - name: Create folder
       file: path={{ app_path }} state=directory mode=0755 owner={{ app_user }} group={{ app_group }}
 
-    - name: Mettre les bons droits sur les répertoires
+    - name: Set proper permissions on the directory
       file: dest={{ app_path }}
           mode=0775 owner={{ app_user }} group={{ app_group }}
           recurse=yes
@@ -20,5 +20,7 @@
   gather_facts: false
 
   roles:
+    - common
     - { role: nginx, domains: [ { domain: symfony.dev, document_root: /vhost/current/web, environment: development, index: app_dev.php} ] }
     - php-fpm
+#    - memcached

@@ -1,0 +1,3 @@
+---
+varnish:
+    conf_path: /etc/sysconfig/varnish
