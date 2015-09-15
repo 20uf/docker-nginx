@@ -10,18 +10,26 @@ RUN apt-get -y update && \
 RUN rm /usr/sbin/policy-rc.d
 RUN echo '[symfony]\nlocalhost\n' > /etc/ansible/hosts
 
+# playbook
+ADD ansible/ ansible/
+RUN ansible-playbook ansible/playbook.yml -c local -vvv
+
 # ssh
 RUN mkdir /root/.ssh && \
   ssh-keyscan bitbucket.org  >> /root/.ssh/known_hosts && \
   ssh-keyscan github.com  >> /root/.ssh/known_hosts
 
-# playbook
-ADD ansible/ ansible/
-RUN ansible-playbook ansible/playbook.yml -c local -vvv
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log
+RUN ln -sf /dev/stderr /var/log/nginx/error.log
+
+VOLUME ["/var/cache/nginx"]
 
 # Port
 EXPOSE 80 443
 
-ADD start.sh /start.sh 
-RUN chmod +x /start.sh
-ENTRYPOINT ["/start.sh"]
+ADD html/ /vhost/current/
+
+COPY ./start.sh /run/start.sh
+WORKDIR /run
+CMD ["./start.sh"]

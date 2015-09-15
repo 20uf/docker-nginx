@@ -9,6 +9,33 @@ server {
         # by serving Gzip versions of the files.
         gzip_static on;
 
+        location / {
+                # try to serve file directly, fallback to app.php
+                try_files $uri /app.php$is_args$args;
+        }
+
+        # DEV
+        # This rule should only be placed on your development environment
+        # In production, don't include this and don't deploy app_dev.php or config.php
+        location ~ ^/(app_dev|config)\.php(/|$) {
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+
+        # PROD
+        location ~ ^/app\.php(/|$) {
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            # Prevents URIs that include the front controller. This will 404:
+            # http://domain.tld/app.php/some-path
+            # Remove the internal directive to allow URIs like this
+            internal;
+        }
+
         location = /favicon.ico {
                 log_not_found off;
                 access_log off;
@@ -18,49 +45,6 @@ server {
                 allow all;
                 log_not_found off;
                 access_log off;
-        }
-
-        location ~ \..*/.*\.php$ {
-                return 403;
-        }
-
-        # No no for private
-        location ~ ^/sites/.*/private/ {
-                return 403;
-        }
-
-        # Block access to "hidden" files and directories whose names begin with a
-        # period. This includes directories used by version control systems such
-        # as Subversion or Git to store control files.
-        location ~ (^|/)\. {
-                return 403;
-        }
-
-        location / {
-                # try to serve file directly, fallback to app.php
-                try_files $uri /app.php$is_args$args;
-        }
-        # DEV
-        # This rule should only be placed on your development environment
-        # In production, don't include this and don't deploy app_dev.php or config.php
-        location ~ ^/(app_dev|config)\.php(/|$) {
-                fastcgi_pass unix:/var/run/php5-fpm.sock;
-                fastcgi_split_path_info ^(.+\.php)(/.*)$;
-                include fastcgi_params;
-                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                fastcgi_param HTTPS off;
-        }
-        # PROD
-        location ~ ^/app\.php(/|$) {
-                fastcgi_pass unix:/var/run/php5-fpm.sock;
-                fastcgi_split_path_info ^(.+\.php)(/.*)$;
-                include fastcgi_params;
-                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                fastcgi_param HTTPS off;
-                # Prevents URIs that include the front controller. This will 404:
-                # http://domain.tld/app.php/some-path
-                # Remove the internal directive to allow URIs like this
-                internal;
         }
 
         location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
