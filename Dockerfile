@@ -32,4 +32,5 @@ ADD html/ /vhost/current/
 
 COPY ./start.sh /run/start.sh
 WORKDIR /run
+RUN chmod +x start.sh
 CMD ["./start.sh"]
