@@ -28,7 +28,7 @@ VOLUME ["/var/cache/nginx"]
 # Port
 EXPOSE 80 443
 
-ADD html/ /vhost/current/
+ADD web/ /vhost/current/web/
 
 COPY ./start.sh /run/start.sh
 WORKDIR /run
