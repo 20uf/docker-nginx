@@ -10,5 +10,10 @@
   - php5-memcached
   - php5-apcu
   - php5-intl
+#  - php5-xdebug
+  - php5-mysql
   notify:
     - Start PHP-FPM
+
+#- name: set config xdebug
+#  template: src=xdebug.j2 dest=/etc/php5/conf.d/xdebug.ini
