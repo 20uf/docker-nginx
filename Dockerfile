@@ -1,5 +1,5 @@
 FROM debian:jessie
-MAINTAINER 20uf <michael.coulleret@gmail.com>
+MAINTAINER Michael COULLERET <michael@coulleret.pro>
 
 # Install Curl and Git.
 RUN apt-get -y update && \
